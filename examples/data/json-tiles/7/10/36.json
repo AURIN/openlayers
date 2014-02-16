@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","features":[{"id":"218","type":"Feature","properties":{"name":"NDBC Buoy Station NKTA2"},"geometry":{"type":"Point","coordinates":[-16853548.26712,8553395.78202009]}},{"id":"604","type":"Feature","properties":{"name":"NDBC Buoy Station ANTA2"},"geometry":{"type":"Point","coordinates":[-16685678.4750038,8680677.48512121]}}]}

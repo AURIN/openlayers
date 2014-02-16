@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","features":[{"id":"202","type":"Feature","properties":{"name":"NDBC Buoy Station ANMN6"},"geometry":{"type":"Point","coordinates":[-8228402.8009664,5163676.13822402]}},{"id":"484","type":"Feature","properties":{"name":"NDBC Buoy Station BRHC3"},"geometry":{"type":"Point","coordinates":[-8146582.97523335,5037892.71033728]}}]}

@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","features":[{"id":"70","type":"Feature","properties":{"name":"NDBC Buoy Station MRYA2"},"geometry":{"type":"Point","coordinates":[-14603113.4412432,7381103.74974397]}},{"id":"145","type":"Feature","properties":{"name":"NDBC Buoy Station KECA2"},"geometry":{"type":"Point","coordinates":[-14652427.9756646,7426764.70282575]}}]}

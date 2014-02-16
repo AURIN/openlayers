@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","features":[{"id":"88","type":"Feature","properties":{"name":"NDBC Buoy Station PGBP7"},"geometry":{"type":"Point","coordinates":[16118728.3083936,1508672.93509496]}},{"id":"580","type":"Feature","properties":{"name":"NDBC Buoy Station LLBP7"},"geometry":{"type":"Point","coordinates":[16227042.1729355,1707300.49545387]}}]}

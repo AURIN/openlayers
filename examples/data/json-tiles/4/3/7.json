@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","features":[{"id":"348","type":"Feature","properties":{"name":"NDBC Buoy Station SACV4"},"geometry":{"type":"Point","coordinates":[-10697023.828798,2175432.34526185]}},{"id":"395","type":"Feature","properties":{"name":"NDBC Buoy Station LMBV4"},"geometry":{"type":"Point","coordinates":[-10728861.2031649,2224996.1685794]}}]}
