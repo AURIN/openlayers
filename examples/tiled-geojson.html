@@ -1,0 +1,92 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Seamless tiled GeoJSON and TopoJSON</title>
+<link rel="stylesheet" href="../theme/default/style.css" type="text/css">
+<link rel="stylesheet" href="style.css" type="text/css">
+<style type="text/css">
+#controlToggle li {
+	list-style: none;
+}
+</style>
+<script src="../lib/OpenLayers.js"></script>
+<script type="text/javascript">
+  var map, drawControls, selectControl, selectedFeature;
+  var epsg4326 = new OpenLayers.Projection('EPSG:4326');
+  var epsg900913 = new OpenLayers.Projection('EPSG:900913');
+  function onPopupClose(evt) {
+    selectControl.unselect(selectedFeature);
+  }
+  function onFeatureSelect(feature) {
+    selectedFeature = feature;
+    featureLonLat = feature.geometry.bounds.getCenterLonLat();
+    popup = new OpenLayers.Popup.FramedCloud("feature-popup", featureLonLat,
+        null, "<div style='font-size:.8em'>Feature: "
+            + feature.attributes.lga_name06 + "<br>Loc: "
+            + featureLonLat.clone().transform(epsg900913, epsg4326) + "</div>",
+        null, true, onPopupClose);
+    feature.popup = popup;
+    map.addPopup(popup);
+  }
+  function onFeatureUnselect(feature) {
+    map.removePopup(feature.popup);
+    feature.popup.destroy();
+    feature.popup = null;
+  }
+  function init() {
+    map = new OpenLayers.Map('map', {
+      displayProjection : epsg900913
+    });
+
+    // OpenStreetMap base layer with numZoomLevels set to number of data levels provided with this example
+    var lay_osm = new OpenLayers.Layer.OSM("OpenStreetmap", [
+        'http://a.tile.openstreetmap.org/${z}/${x}/${y}.png',
+        'http://b.tile.openstreetmap.org/${z}/${x}/${y}.png',
+        'http://c.tile.openstreetmap.org/${z}/${x}/${y}.png' ], {
+      minZoomLevel : 4,
+      maxZoomLevel : 12,
+      projection : epsg900913
+    });
+    map.addLayer(lay_osm);
+
+    // GeoJson tiled layer
+    var tileLayer = new OpenLayers.Layer.SeamlessGeoJSON("LGA",
+        "http://localhost/vts/layers/lga/${z}/${x}/${y}.json", {
+          projection : epsg900913
+        });
+    map.addLayer(tileLayer);
+
+    // Note that the selection control needs to be placed on the underlying featureLayer
+    selectControl = new OpenLayers.Control.SelectFeature(
+        tileLayer.featureLayer, {
+          onSelect : onFeatureSelect,
+          onUnselect : onFeatureUnselect
+        });
+    map.addControl(selectControl);
+    selectControl.activate();
+
+    map.addControl(new OpenLayers.Control.LayerSwitcher());
+    map.addControl(new OpenLayers.Control.Navigation({
+      dragPanOptions : {
+        enableKinetic : true
+      }
+    }));
+
+    map.setCenter(new OpenLayers.LonLat(140, -30).transform(epsg4326,
+        epsg900913), 3);
+  }
+</script>
+</head>
+<body onload="init()">
+	<h1 id="title">Seamless tiled GeoJSON and TopoJSON</h1>
+	<div id="tags">vector, geojson, topojson, feature, selecting,
+		selection, popup</div>
+	<p id="shortdesc">This shows how to use OpenLayers.Layer.GeoJSON to
+		present tiled GeoJSON data.</p>
+	<div id="map"
+		style="width: 600px; height: 600px; border: 1px solid #ccc;"></div>
+</body>
+</html>
