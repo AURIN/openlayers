@@ -52,21 +52,64 @@
     });
     map.addLayer(lay_osm);
 
-    // GeoJson tiled layer
-    var tileLayer = new OpenLayers.Layer.SeamlessGeoJSON("LGA",
+    // GeoJson tiled layer (drwan in green)
+    var tileLayer = new OpenLayers.Layer.SeamlessGeoJSON("Json LGA",
         "http://localhost/vts/layers/lga/${z}/${x}/${y}.json", {
-          projection : epsg900913
+          projection : epsg900913,
+          styleMap: new OpenLayers.StyleMap({default:  new OpenLayers.Style({
+            strokeColor : "#66CC66",
+            fill : true,
+            fillOpacity : 0.2,
+            fillColor : "#66CC66"
+          }),
+            select:  new OpenLayers.Style({
+              strokeColor : "#66FFFF",
+              fill : true,
+              fillOpacity : 0.2,
+              fillColor : "#66FFFF"
+            })
+          })
+        }); 
+     
+    // TopoJson tiled layer (drwan in orange)
+    var topoLayer = new OpenLayers.Layer.SeamlessGeoJSON("Topo LGA",
+        "http://localhost/vts/layers/lga/${z}/${x}/${y}.topojson", {
+          projection : epsg900913,
+          format : "topojson",
+          styleMap: new OpenLayers.StyleMap({default:  new OpenLayers.Style({
+            strokeColor : "#FF9933",
+            fill : true,
+            fillOpacity : 0.2,
+            fillColor : "#FF9933"
+          }),
+            select:  new OpenLayers.Style({
+              strokeColor : "#66FFFF",
+              fill : true,
+              fillOpacity : 0.2,
+              fillColor : "#66FFFF"
+            })
+          })
         });
-    map.addLayer(tileLayer);
 
+    map.addLayer(tileLayer);
+    map.addLayer(topoLayer);
+    
     // Note that the selection control needs to be placed on the underlying featureLayer
-    selectControl = new OpenLayers.Control.SelectFeature(
-        tileLayer.featureLayer, {
+     selectControlTile = new OpenLayers.Control.SelectFeature(
+     tileLayer.featureLayer, {
+     onSelect : onFeatureSelect,
+     onUnselect : onFeatureUnselect
+     });
+     map.addControl(selectControlTile);
+     selectControlTile.activate();
+     
+    selectControlTopo = new OpenLayers.Control.SelectFeature(
+        topoLayer.featureLayer, {
           onSelect : onFeatureSelect,
           onUnselect : onFeatureUnselect
         });
-    map.addControl(selectControl);
-    selectControl.activate();
+    map.addControl(selectControlTopo);
+    selectControlTopo.activate();
 
     map.addControl(new OpenLayers.Control.LayerSwitcher());
     map.addControl(new OpenLayers.Control.Navigation({
