@@ -14,30 +14,15 @@
 </style>
 <script src="../lib/OpenLayers.js"></script>
 <script type="text/javascript">
-  var map, drawControls, selectControl, selectedFeature;
+  var mapTile, mapTopo, drawControls;
   var epsg4326 = new OpenLayers.Projection('EPSG:4326');
   var epsg900913 = new OpenLayers.Projection('EPSG:900913');
-  function onPopupClose(evt) {
-    selectControl.unselect(selectedFeature);
-  }
-  function onFeatureSelect(feature) {
-    selectedFeature = feature;
-    featureLonLat = feature.geometry.bounds.getCenterLonLat();
-    popup = new OpenLayers.Popup.FramedCloud("feature-popup", featureLonLat,
-        null, "<div style='font-size:.8em'>Feature: "
-            + feature.attributes.lga_name06 + "<br>Loc: "
-            + featureLonLat.clone().transform(epsg900913, epsg4326) + "</div>",
-        null, true, onPopupClose);
-    feature.popup = popup;
-    map.addPopup(popup);
-  }
-  function onFeatureUnselect(feature) {
-    map.removePopup(feature.popup);
-    feature.popup.destroy();
-    feature.popup = null;
-  }
+  
   function init() {
-    map = new OpenLayers.Map('map', {
+    mapTile = new OpenLayers.Map('mapTile', {
+      displayProjection : epsg900913
+    });
+    mapTopo = new OpenLayers.Map('mapTopo', {
       displayProjection : epsg900913
     });
 
@@ -47,15 +32,18 @@
         'http://b.tile.openstreetmap.org/${z}/${x}/${y}.png',
         'http://c.tile.openstreetmap.org/${z}/${x}/${y}.png' ], {
       minZoomLevel : 4,
-      maxZoomLevel : 12,
+      maxZoomLevel : 17,
       projection : epsg900913
     });
-    map.addLayer(lay_osm);
+    mapTile.addLayer(lay_osm);
+    mapTopo.addLayer(lay_osm.clone());
 
-    // GeoJson tiled layer (drwan in green)
+    // GeoJson tiled layer (drawn in green)
     var tileLayer = new OpenLayers.Layer.SeamlessGeoJSON("Json LGA",
         "http://localhost/vts/layers/lga/${z}/${x}/${y}.json", {
           projection : epsg900913,
+          initialdelay: 1000,
+          tileloaddelay: 500,
           styleMap: new OpenLayers.StyleMap({default:  new OpenLayers.Style({
             strokeColor : "#66CC66",
             fill : true,
@@ -71,11 +59,13 @@
           })
         }); 
      
-    // TopoJson tiled layer (drwan in orange)
+    // TopoJson tiled layer (drawn in orange)
     var topoLayer = new OpenLayers.Layer.SeamlessGeoJSON("Topo LGA",
         "http://localhost/vts/layers/lga/${z}/${x}/${y}.topojson", {
           projection : epsg900913,
           format : "topojson",
+          initialdelay: 500,
+          tileloaddelay: 200,
           styleMap: new OpenLayers.StyleMap({default:  new OpenLayers.Style({
             strokeColor : "#FF9933",
             fill : true,
@@ -90,36 +80,27 @@
             })
           })
         });
-
-    map.addLayer(tileLayer);
-    map.addLayer(topoLayer);
     
-    // Note that the selection control needs to be placed on the underlying featureLayer
-     selectControlTile = new OpenLayers.Control.SelectFeature(
-     tileLayer.featureLayer, {
-     onSelect : onFeatureSelect,
-     onUnselect : onFeatureUnselect
-     });
-     map.addControl(selectControlTile);
-     selectControlTile.activate();
-     
-    selectControlTopo = new OpenLayers.Control.SelectFeature(
-        topoLayer.featureLayer, {
-          onSelect : onFeatureSelect,
-          onUnselect : onFeatureUnselect
-        });
-    map.addControl(selectControlTopo);
-    selectControlTopo.activate();
-
-    map.addControl(new OpenLayers.Control.LayerSwitcher());
-    map.addControl(new OpenLayers.Control.Navigation({
+    mapTile.addLayer(tileLayer);
+    mapTile.addControl(new OpenLayers.Control.Navigation({
       dragPanOptions : {
         enableKinetic : true
       }
     }));
+    mapTile.setCenter(new OpenLayers.LonLat(135, -30).transform(epsg4326,
+        epsg900913), 4);
 
-    map.setCenter(new OpenLayers.LonLat(140, -30).transform(epsg4326,
-        epsg900913), 3);
+    // Pauses to aqllow the drawing of the first map
+    setTimeout(function() {
+      mapTopo.addLayer(topoLayer);
+      mapTopo.addControl(new OpenLayers.Control.Navigation({
+        dragPanOptions : {
+          enableKinetic : true
+        }
+      }));
+      mapTopo.setCenter(new OpenLayers.LonLat(135, -30).transform(epsg4326,
+          epsg900913), 4);
+    }, 3000);
   }
 </script>
 </head>
@@ -127,9 +108,13 @@
 	<h1 id="title">Seamless tiled GeoJSON and TopoJSON</h1>
 	<div id="tags">vector, geojson, topojson, feature, selecting,
 		selection, popup</div>
-	<p id="shortdesc">This shows how to use OpenLayers.Layer.GeoJSON to
-		present tiled GeoJSON data.</p>
-	<div id="map"
-		style="width: 600px; height: 600px; border: 1px solid #ccc;"></div>
+	<p id="shortdesc">This shows how to use
+		OpenLayers.Layer.SeeamlessGeoJSON to present tiled GeoJSON data.</p>
+	<div id="mapTile"
+		style="width: 500px; height: 500px; border: 1px solid #ccc;"></div>
+	<p id="shortdesc">This shows how to use
+		OpenLayers.Layer.SeeamlessGeoJSON to present tiled TopoJSON data.</p>
+	<div id="mapTopo"
+		style="width: 500px; height: 500px; border: 1px solid #ccc;"></div>
 </body>
 </html>
