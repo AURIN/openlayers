@@ -38,17 +38,17 @@
     mapTile.addLayer(lay_osm);
     mapTopo.addLayer(lay_osm.clone());
 
-    // GeoJson tiled layer (drawn in green)
+    // GeoJson tiled layer (drawn in pink)
     var tileLayer = new OpenLayers.Layer.SeamlessGeoJSON("Json LGA",
         "http://localhost/vts/layers/lga/${z}/${x}/${y}.json", {
           projection : epsg900913,
-          initialdelay: 1000,
-          tileloaddelay: 500,
+          initialdelay: 500,
+          tileloaddelay: 400,
           styleMap: new OpenLayers.StyleMap({default:  new OpenLayers.Style({
-            strokeColor : "#66CC66",
+            strokeColor : "#FF66CC",
             fill : true,
             fillOpacity : 0.2,
-            fillColor : "#66CC66"
+            fillColor : "#FF66CC"
           }),
             select:  new OpenLayers.Style({
               strokeColor : "#66FFFF",
@@ -65,7 +65,7 @@
           projection : epsg900913,
           format : "topojson",
           initialdelay: 500,
-          tileloaddelay: 200,
+          tileloaddelay: 400,
           styleMap: new OpenLayers.StyleMap({default:  new OpenLayers.Style({
             strokeColor : "#FF9933",
             fill : true,
@@ -90,7 +90,7 @@
     mapTile.setCenter(new OpenLayers.LonLat(135, -30).transform(epsg4326,
         epsg900913), 4);
 
-    // Pauses to aqllow the drawing of the first map
+    // Pauses to allow the drawing of the first map
     setTimeout(function() {
       mapTopo.addLayer(topoLayer);
       mapTopo.addControl(new OpenLayers.Control.Navigation({
@@ -101,6 +101,21 @@
       mapTopo.setCenter(new OpenLayers.LonLat(135, -30).transform(epsg4326,
           epsg900913), 4);
     }, 3000);
+    
+    // Syncs the two maps
+    var c1, c2, z1, z2; 
+    mapTile.events.register("moveend", mapTile, function() { 
+            c1 = this.getCenter(); 
+            z1 = this.getZoom(); 
+            mapTopo.panTo(c1); 
+            mapTopo.zoomTo(z1); 
+    }); 
+    mapTopo.events.register("moveend", mapTopo, function() { 
+            c2 = this.getCenter(); 
+            z2 = this.getZoom(); 
+            mapTile.panTo(c2); 
+            mapTile.zoomTo(z2); 
+    });     
   }
 </script>
 </head>
@@ -111,10 +126,10 @@
 	<p id="shortdesc">This shows how to use
 		OpenLayers.Layer.SeeamlessGeoJSON to present tiled GeoJSON data.</p>
 	<div id="mapTile"
-		style="width: 500px; height: 500px; border: 1px solid #ccc;"></div>
+		style="width: 500px; height: 430px; border: 1px solid #ccc;"></div>
 	<p id="shortdesc">This shows how to use
 		OpenLayers.Layer.SeeamlessGeoJSON to present tiled TopoJSON data.</p>
 	<div id="mapTopo"
-		style="width: 500px; height: 500px; border: 1px solid #ccc;"></div>
+		style="width: 500px; height: 430px; border: 1px solid #ccc;"></div>
 </body>
 </html>
