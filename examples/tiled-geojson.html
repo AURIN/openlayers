@@ -27,23 +27,25 @@
     });
 
     // OpenStreetMap base layer with numZoomLevels set to number of data levels provided with this example
-    var lay_osm = new OpenLayers.Layer.OSM("OpenStreetmap", [
-        'http://a.tile.openstreetmap.org/${z}/${x}/${y}.png',
-        'http://b.tile.openstreetmap.org/${z}/${x}/${y}.png',
-        'http://c.tile.openstreetmap.org/${z}/${x}/${y}.png' ], {
+    var baseLayer = new OpenLayers.Layer.OSM("OpenStreetmap", [
+        'http://a.tile.stamen.com/toner/${z}/${x}/${y}.png',
+        'http://b.tile.stamen.com/toner/${z}/${x}/${y}.png',
+        'http://c.tile.stamen.com/toner/${z}/${x}/${y}.png' ], {
       minZoomLevel : 4,
       maxZoomLevel : 17,
       projection : epsg900913
     });
-    mapTile.addLayer(lay_osm);
-    mapTopo.addLayer(lay_osm.clone());
+    mapTile.addLayer(baseLayer);
+    mapTopo.addLayer(baseLayer.clone());
 
-    // GeoJson tiled layer (drawn in pink)
+    // GeoJson polygon tiled layer (LGAs drawn in pink)
     var tileLayer = new OpenLayers.Layer.SeamlessGeoJSON("Json LGA",
         "http://localhost/vts/layers/lga/${z}/${x}/${y}.json", {
           projection : epsg900913,
           initialdelay: 500,
           tileloaddelay: 400,
+          minZoomLevel : 0,
+          maxZoomLevel : 20,
           styleMap: new OpenLayers.StyleMap({default:  new OpenLayers.Style({
             strokeColor : "#FF66CC",
             fill : true,
@@ -59,13 +61,15 @@
           })
         }); 
      
-    // TopoJson tiled layer (drawn in orange)
-    var topoLayer = new OpenLayers.Layer.SeamlessGeoJSON("Topo LGA",
-        "http://localhost/vts/layers/lga/${z}/${x}/${y}.topojson", {
+    // TopoJson polygon tiled layer (PBCs drawn in orange)
+    var topoLayer = new OpenLayers.Layer.SeamlessGeoJSON("Topo PBC",
+        "http://localhost/vts/layers/pbc/${z}/${x}/${y}.topojson", {
           projection : epsg900913,
           format : "topojson",
           initialdelay: 500,
           tileloaddelay: 400,
+          minZoomLevel : 0,
+          maxZoomLevel : 20,
           styleMap: new OpenLayers.StyleMap({default:  new OpenLayers.Style({
             strokeColor : "#FF9933",
             fill : true,
@@ -80,7 +84,30 @@
             })
           })
         });
-    
+
+    // GeoJSON line tiled layer (drawn in green), visible only for Victoria at high zoom levels
+    /*
+    var streetLayer = new OpenLayers.Layer.SeamlessGeoJSON("Streets",
+        "http://localhost/vts/layers/street/${z}/${x}/${y}.json", {
+          projection : epsg900913,
+          format : "json",
+          initialdelay: 500,
+          tileloaddelay: 400,
+          minZoomLevel : 15,
+          maxZoomLevel : 20,
+          styleMap: new OpenLayers.StyleMap({default:  new OpenLayers.Style({
+              strokeColor : "#99FF99",
+              strokeWidth : 4,
+              fill: false
+          }),
+            select:  new OpenLayers.Style({
+              strokeColor : "#66FFFF",
+              fill: false
+            })
+          })
+        });
+    */
+//    mapTile.addLayer(streetLayer);
     mapTile.addLayer(tileLayer);
     mapTile.addControl(new OpenLayers.Control.Navigation({
       dragPanOptions : {
@@ -101,21 +128,6 @@
       mapTopo.setCenter(new OpenLayers.LonLat(135, -30).transform(epsg4326,
           epsg900913), 4);
     }, 3000);
-    
-    // Syncs the two maps
-    var c1, c2, z1, z2; 
-    mapTile.events.register("moveend", mapTile, function() { 
-            c1 = this.getCenter(); 
-            z1 = this.getZoom(); 
-            mapTopo.panTo(c1); 
-            mapTopo.zoomTo(z1); 
-    }); 
-    mapTopo.events.register("moveend", mapTopo, function() { 
-            c2 = this.getCenter(); 
-            z2 = this.getZoom(); 
-            mapTile.panTo(c2); 
-            mapTile.zoomTo(z2); 
-    });     
   }
 </script>
 </head>
@@ -124,11 +136,11 @@
 	<div id="tags">vector, geojson, topojson, feature, selecting,
 		selection, popup</div>
 	<p id="shortdesc">This shows how to use
-		OpenLayers.Layer.SeeamlessGeoJSON to present tiled GeoJSON data.</p>
+		OpenLayers.Layer.SeeamlessGeoJSON to present tiled GeoJSON data (LGAs).</p>
 	<div id="mapTile"
 		style="width: 500px; height: 430px; border: 1px solid #ccc;"></div>
 	<p id="shortdesc">This shows how to use
-		OpenLayers.Layer.SeeamlessGeoJSON to present tiled TopoJSON data.</p>
+		OpenLayers.Layer.SeeamlessGeoJSON to present tiled TopoJSON data (PBCs).</p>
 	<div id="mapTopo"
 		style="width: 500px; height: 430px; border: 1px solid #ccc;"></div>
 </body>
