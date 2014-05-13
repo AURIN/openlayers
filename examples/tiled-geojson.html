@@ -22,9 +22,6 @@
     mapTile = new OpenLayers.Map('mapTile', {
       displayProjection : epsg900913
     });
-    mapTopo = new OpenLayers.Map('mapTopo', {
-      displayProjection : epsg900913
-    });
 
     // OpenStreetMap base layer with numZoomLevels set to number of data levels provided with this example
     var baseLayer = new OpenLayers.Layer.OSM("OpenStreetmap", [
@@ -36,11 +33,10 @@
       projection : epsg900913
     });
     mapTile.addLayer(baseLayer);
-    mapTopo.addLayer(baseLayer.clone());
 
-    // GeoJson polygon tiled layer (LGAs drawn in pink)
-    var tileLayer = new OpenLayers.Layer.SeamlessGeoJSON("Json LGA",
-        "http://localhost/vts/layers/lga/${z}/${x}/${y}.json", {
+    // GeoJson polygon tiled layer (in pink)
+    var tileLayer = new OpenLayers.Layer.SeamlessGeoJSON("Country GeoJSON",
+        "http://localhost/vts/layers/country/${z}/${x}/${y}.json", {
           projection : epsg900913,
           initialdelay: 500,
           tileloaddelay: 400,
@@ -61,11 +57,12 @@
           })
         }); 
      
-    // TopoJson polygon tiled layer (PBCs drawn in orange)
-    var topoLayer = new OpenLayers.Layer.SeamlessGeoJSON("Topo PBC",
-        "http://localhost/vts/layers/pbc/${z}/${x}/${y}.topojson", {
+    // TopoJson polygon tiled layer (in orange)
+    var tileLayer = new OpenLayers.Layer.SeamlessGeoJSON("State JOSN",
+        "http://localhost/vts/layers/ste/${z}/${x}/${y}.json", {
+//        "https://dev-api.aurin.org.au/vts/layers/ste/${z}/${x}/${y}.json", {
           projection : epsg900913,
-          format : "topojson",
+          format : "json",
           initialdelay: 500,
           tileloaddelay: 400,
           minZoomLevel : 0,
@@ -84,9 +81,10 @@
             })
           })
         });
+    mapTile.addLayer(tileLayer);
 
     // GeoJSON line tiled layer (drawn in green), visible only for Victoria at high zoom levels
-    /*
+    /* FIXME: #2828
     var streetLayer = new OpenLayers.Layer.SeamlessGeoJSON("Streets",
         "http://localhost/vts/layers/street/${z}/${x}/${y}.json", {
           projection : epsg900913,
@@ -106,29 +104,44 @@
             })
           })
         });
+    mapTile.addLayer(streetLayer);
     */
-//    mapTile.addLayer(streetLayer);
-    mapTile.addLayer(tileLayer);
+    
     mapTile.addControl(new OpenLayers.Control.Navigation({
       dragPanOptions : {
         enableKinetic : true
       }
     }));
+    
+    var report = function(e) {
+      OpenLayers.Console.log(e.type, e.feature.id);
+    };
+  
+    var highlightCtrl = new OpenLayers.Control.SelectFeature(tileLayer.featureLayer, {
+      hover: true,
+      highlightOnly: true,
+      renderIntent: "temporary",
+      eventListeners: {
+          beforefeaturehighlighted: report,
+          featurehighlighted: report,
+          featureunhighlighted: report
+      }
+    });
+
+    var selectCtrl = new OpenLayers.Control.SelectFeature(tileLayer.featureLayer,
+      {clickout: true}
+    );
+
+    mapTile.addControl(highlightCtrl);
+    mapTile.addControl(selectCtrl);
+
+    highlightCtrl.activate();
+    selectCtrl.activate();
+    
     mapTile.setCenter(new OpenLayers.LonLat(135, -30).transform(epsg4326,
         epsg900913), 4);
-
-    // Pauses to allow the drawing of the first map
-    setTimeout(function() {
-      mapTopo.addLayer(topoLayer);
-      mapTopo.addControl(new OpenLayers.Control.Navigation({
-        dragPanOptions : {
-          enableKinetic : true
-        }
-      }));
-      mapTopo.setCenter(new OpenLayers.LonLat(135, -30).transform(epsg4326,
-          epsg900913), 4);
-    }, 3000);
   }
+    
 </script>
 </head>
 <body onload="init()">
@@ -136,12 +149,8 @@
 	<div id="tags">vector, geojson, topojson, feature, selecting,
 		selection, popup</div>
 	<p id="shortdesc">This shows how to use
-		OpenLayers.Layer.SeeamlessGeoJSON to present tiled GeoJSON data (LGAs).</p>
+		OpenLayers.Layer.SeeamlessGeoJSON to present tiled vector data.</p>
 	<div id="mapTile"
-		style="width: 500px; height: 430px; border: 1px solid #ccc;"></div>
-	<p id="shortdesc">This shows how to use
-		OpenLayers.Layer.SeeamlessGeoJSON to present tiled TopoJSON data (PBCs).</p>
-	<div id="mapTopo"
-		style="width: 500px; height: 430px; border: 1px solid #ccc;"></div>
+		style="width: 700px; height: 600px; border: 1px solid #ccc;"></div>
 </body>
 </html>
