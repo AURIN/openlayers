@@ -4,7 +4,7 @@
 <meta name="viewport"
 	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Seamless tiled GeoJSON and TopoJSON</title>
+<title>Seamless tiled GeoJSON or TopoJSON</title>
 <link rel="stylesheet" href="../theme/default/style.css" type="text/css">
 <link rel="stylesheet" href="style.css" type="text/css">
 <style type="text/css">
@@ -34,35 +34,12 @@
     });
     mapTile.addLayer(baseLayer);
 
-    // GeoJson polygon tiled layer (in pink)
-    var tileLayer = new OpenLayers.Layer.SeamlessGeoJSON("Country GeoJSON",
-        "http://localhost/vts/layers/country/${z}/${x}/${y}.json", {
+    // Tiled layer (in orange)
+    var tileLayer = new OpenLayers.Layer.SeamlessGeoJSON("State TopoJSON",
+//        "http://localhost:2005/layers/ste/${z}/${x}/${y}.topojson", {
+        "https://dev-api.aurin.org.au/vts/layers/ste/${z}/${x}/${y}.topojson", {
           projection : epsg900913,
-          initialdelay: 500,
-          tileloaddelay: 400,
-          minZoomLevel : 0,
-          maxZoomLevel : 20,
-          styleMap: new OpenLayers.StyleMap({default:  new OpenLayers.Style({
-            strokeColor : "#FF66CC",
-            fill : true,
-            fillOpacity : 0.2,
-            fillColor : "#FF66CC"
-          }),
-            select:  new OpenLayers.Style({
-              strokeColor : "#66FFFF",
-              fill : true,
-              fillOpacity : 0.2,
-              fillColor : "#66FFFF"
-            })
-          })
-        }); 
-     
-    // TopoJson polygon tiled layer (in orange)
-    var tileLayer = new OpenLayers.Layer.SeamlessGeoJSON("State JOSN",
-        "http://localhost/vts/layers/ste/${z}/${x}/${y}.json", {
-//        "https://dev-api.aurin.org.au/vts/layers/ste/${z}/${x}/${y}.json", {
-          projection : epsg900913,
-          format : "json",
+          format : "topojson",
           initialdelay: 500,
           tileloaddelay: 400,
           minZoomLevel : 0,
