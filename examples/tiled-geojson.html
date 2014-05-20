@@ -35,9 +35,9 @@
     mapTile.addLayer(baseLayer);
 
     // Tiled layer (in orange)
-    var tileLayer = new OpenLayers.Layer.SeamlessGeoJSON("State TopoJSON",
+    var tileLayer = new OpenLayers.Layer.SeamlessGeoJSON("CD TopoJSON",
 //        "http://localhost:2005/layers/ste/${z}/${x}/${y}.topojson", {
-        "https://dev-api.aurin.org.au/vts/layers/ste/${z}/${x}/${y}.topojson", {
+        "https://dev-api.aurin.org.au/vts/layers/cd06/${z}/${x}/${y}.topojson", {
           projection : epsg900913,
           format : "topojson",
           initialdelay: 500,
@@ -60,6 +60,7 @@
         });
     mapTile.addLayer(tileLayer);
 
+    
     // GeoJSON line tiled layer (drawn in green), visible only for Victoria at high zoom levels
     /* FIXME: #2828
     var streetLayer = new OpenLayers.Layer.SeamlessGeoJSON("Streets",
