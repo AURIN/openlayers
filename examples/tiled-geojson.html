@@ -38,7 +38,9 @@
     var maxExtent= new OpenLayers.Bounds([140, -40, 170, -10]); // see #2972 
     maxExtent.transform(epsg4326, epsg900913); // see #2972 
     var tileLayer = new OpenLayers.Layer.SeamlessGeoJSON("CD TopoJSON",
-        "http://localhost:2005/layers/lga/${z}/${x}/${y}.topojson", {
+      "http://localhost:2005/layers/ste/${z}/${x}/${y}.topojson", {
+//        "http://localhost:2005/layers/country/${z}/${x}/${y}.topojson", {
+//          "http://localhost:2005/layers/lga/${z}/${x}/${y}.topojson", {
 //        "https://dev-api.aurin.org.au/vts/layers/lga/${z}/${x}/${y}.topojson", {
           projection : epsg900913,
           format : "topojson",
@@ -46,6 +48,19 @@
           tileloaddelay: 400,
           minZoomLevel : 0,
           maxZoomLevel : 20,
+          strategies: [
+                       new OpenLayers.Strategy.Filter({filter: new OpenLayers.Filter.FeatureId({ 
+                       fids: ["1",
+                              "2",
+                              "3",
+//                              "4",
+                              "5",
+                              "6",
+                              "7",
+                              "8",
+                              "9"
+                              ] 
+                     })})],
           styleMap: new OpenLayers.StyleMap({default:  new OpenLayers.Style({
             strokeColor : "#FF9933",
             fill : true,
